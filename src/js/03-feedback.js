@@ -4,8 +4,6 @@ let formData = {};
 const FEEDBACK_KEY = "feedback-form-state";
 const refs = {
     form: document.querySelector('.feedback-form'),
-    input: document.querySelector('input'),
-    textarea: document.querySelector('textarea'),
 }
 
 refreshedFormInput();
@@ -17,9 +15,10 @@ refs.form.addEventListener('submit', onFormSubmit);
 function onFormSubmit (e) {
     e.preventDefault();
 
-    console.log(localStorage.getItem(FEEDBACK_KEY));    
+    console.log(formData);    
     e.currentTarget.reset();
     localStorage.removeItem(FEEDBACK_KEY);
+    formData = {};
 };
 
 function onFormInput (e) {
@@ -29,17 +28,18 @@ function onFormInput (e) {
 
 function refreshedFormInput () {
     const currentFormData = localStorage.getItem(FEEDBACK_KEY);
-    const parsedData = JSON.parse(localStorage.getItem(FEEDBACK_KEY));
-
-    if (currentFormData) {
+    
+    if (!currentFormData) {
+        return
+    }
         try {
-            console.log(currentFormData)
-            refs.input.value = parsedData.email || '';
-            refs.textarea.value = parsedData.message || '';
-           formData.email = parsedData.email;
-           formData.message = parsedData.message;
+            formData = JSON.parse(currentFormData);
+
+            Object.entries(formData).forEach(entry => {
+                const [key, value] = entry; 
+                refs.form[key].value = value;
+            });
           } catch (error) {
             console.log(error);
         }
     }
-}
